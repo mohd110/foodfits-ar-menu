@@ -5,9 +5,8 @@ const food = document.getElementById('food');
 const loading = document.getElementById('loading');
 const error = document.getElementById('error');
 const errorText = document.getElementById('error-text');
-const arPreview = document.getElementById('ar-preview');
+const foodInfo = document.getElementById('food-info');
 const foodName = document.getElementById('food-name');
-const foodDescription = document.getElementById('food-description');
 const foodDistance = document.getElementById('food-distance');
 
 let net;
@@ -15,7 +14,6 @@ let isProcessing = false;
 let personHeight = 0;
 let lastSegmentationTime = 0;
 let currentFoodName = 'Pizza';
-let currentFoodDescription = 'Delicious fresh pizza with premium toppings';
 let handDetector = null;
 let estimatedDistance = 100;
 let personFace = { x: 0, y: 0, width: 0 };
@@ -148,7 +146,7 @@ async function processFrame() {
     // Scale food based on proximity + person height
     if (food.style.display !== 'none') {
       const baseSize = 15; // vw
-      const proximityScale = Math.min(3, estimatedDistance / 40); // Scales 0.4x to 3x
+      const proximityScale = Math.min(3, estimatedDistance / 40);
       const heightScale = Math.max(1, personHeight / 200);
       const finalScale = proximityScale * heightScale;
       
@@ -156,7 +154,7 @@ async function processFrame() {
       food.style.width = `calc(${baseSize}vw * ${finalScale})`;
       
       // Update distance display
-      foodDistance.textContent = `${Math.round(estimatedDistance)}cm away`;
+      foodDistance.textContent = `${Math.round(estimatedDistance)}cm`;
     }
   } catch (error) {
     console.error('Segmentation error:', error);
@@ -175,32 +173,25 @@ let lastDragX = 0;
 let lastDragY = 0;
 
 document.addEventListener('click', (e) => {
-  if (e.target.closest('#menu') || e.target.closest('.btn')) return;
-  if (e.target.closest('.food-card')) {
-    placeFood(e.clientX, e.clientY);
-  }
+  if (e.target.closest('#menu')) return;
+  placeFood(e.clientX, e.clientY);
 });
 
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1 && !e.target.closest('#menu')) {
     const touch = e.touches[0];
-    const arRect = arPreview.getBoundingClientRect();
-    if (touch.clientY > arRect.top && touch.clientY < arRect.bottom) {
-      placeFood(touch.clientX, touch.clientY);
-    }
+    placeFood(touch.clientX, touch.clientY);
   }
 });
 
 function placeFood(x, y) {
   food.style.display = 'block';
-  const arRect = arPreview.getBoundingClientRect();
-  const relX = x - arRect.left;
-  const relY = y - arRect.top;
-  
-  const foodWidth = food.offsetWidth || 60;
-  food.style.left = `${relX - foodWidth / 2}px`;
-  food.style.top = `${relY - foodWidth / 2}px`;
-  food.style.transform = `rotate(0deg) scale(1)`;
+  const foodWidth = parseInt(food.style.width || '60');
+  food.style.left = `${x - foodWidth / 2}px`;
+  food.style.top = `${y - foodWidth / 2}px`;
+  rotateAngle = Math.random() * 10 - 5;
+  food.style.transform = `rotate(${rotateAngle}deg) scale(${scale})`;
+  foodInfo.classList.remove('hidden');
 }
 
 food.addEventListener('touchstart', (e) => {
@@ -241,19 +232,9 @@ food.addEventListener('touchmove', (e) => {
 function changeFood(src, name, description) {
   food.src = src;
   currentFoodName = name;
-  currentFoodDescription = description;
   foodName.textContent = name;
-  foodDescription.textContent = description;
   if (food.style.display === 'block') {
     scale = 1;
     rotateAngle = 0;
-  }
-}
-
-function orderFood() {
-  if (food.style.display === 'block') {
-    alert(`Order for ${currentFoodName} placed! 🎉\n\nThis is a demo app. In production, this would proceed to checkout.`);
-  } else {
-    alert('Please place a food item on the table first!');
   }
 }
