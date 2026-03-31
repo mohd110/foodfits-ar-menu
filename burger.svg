@@ -1,0 +1,19 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bottom bun -->
+  <ellipse cx="150" cy="200" rx="100" ry="50" fill="#CD853F"/>
+  <!-- Patty -->
+  <rect x="80" y="140" width="140" height="45" fill="#8B4513" rx="10"/>
+  <!-- Cheese -->
+  <rect x="85" y="135" width="130" height="35" fill="#FFD700" rx="8"/>
+  <!-- Lettuce -->
+  <path d="M 80 135 Q 100 120 120 135 Q 140 120 160 135 Q 180 120 200 135 Q 220 120 240 135" fill="#228B22" stroke="#1a6b1a" stroke-width="2"/>
+  <!-- Tomato -->
+  <circle cx="120" cy="125" r="12" fill="#DC143C"/>
+  <circle cx="180" cy="125" r="12" fill="#DC143C"/>
+  <!-- Top bun -->
+  <ellipse cx="150" cy="100" rx="100" ry="50" fill="#DAA520"/>
+  <!-- Sesame seeds -->
+  <circle cx="120" cy="85" r="4" fill="#F5F5DC"/>
+  <circle cx="145" cy="80" r="4" fill="#F5F5DC"/>
+  <circle cx="170" cy="85" r="4" fill="#F5F5DC"/>
+</svg>

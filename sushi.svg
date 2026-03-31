@@ -1,0 +1,22 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Plate -->
+  <circle cx="150" cy="160" r="120" fill="#F5F5DC" stroke="#D3D3D3" stroke-width="3"/>
+  <!-- Sushi piece 1 -->
+  <rect x="80" y="120" width="50" height="40" fill="#E8D8C8" rx="5"/>
+  <rect x="80" y="120" width="50" height="8" fill="#2F4F4F"/>
+  <ellipse cx="105" cy="152" rx="20" ry="10" fill="#FF69B4"/>
+  
+  <!-- Sushi piece 2 -->
+  <rect x="140" y="100" width="50" height="40" fill="#E8D8C8" rx="5"/>
+  <rect x="140" y="100" width="50" height="8" fill="#2F4F4F"/>
+  <ellipse cx="165" cy="132" rx="18" ry="8" fill="#FFD700"/>
+  
+  <!-- Sushi piece 3 -->
+  <rect x="200" y="130" width="50" height="40" fill="#E8D8C8" rx="5"/>
+  <rect x="200" y="130" width="50" height="8" fill="#2F4F4F"/>
+  <circle cx="225" cy="155" r="8" fill="#90EE90"/>
+  <circle cx="235" cy="152" r="6" fill="#90EE90"/>
+  
+  <!-- Wasabi -->
+  <ellipse cx="150" cy="200" rx="25" ry="15" fill="#90EE90"/>
+</svg>

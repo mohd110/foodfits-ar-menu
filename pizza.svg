@@ -1,0 +1,19 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pizza base -->
+  <circle cx="150" cy="150" r="140" fill="#D2691E"/>
+  <!-- Cheese -->
+  <circle cx="150" cy="150" r="130" fill="#FFD700"/>
+  <!-- Sauce spots -->
+  <circle cx="120" cy="110" r="15" fill="#DC143C"/>
+  <circle cx="170" cy="140" r="12" fill="#DC143C"/>
+  <circle cx="140" cy="170" r="14" fill="#DC143C"/>
+  <circle cx="180" cy="170" r="11" fill="#DC143C"/>
+  <!-- Basil leaves -->
+  <ellipse cx="130" cy="130" rx="18" ry="10" fill="#228B22" transform="rotate(-30 130 130)"/>
+  <ellipse cx="160" cy="160" rx="16" ry="9" fill="#228B22" transform="rotate(20 160 160)"/>
+  <!-- Pepperoni -->
+  <circle cx="100" cy="100" r="18" fill="#FF4500"/>
+  <circle cx="100" cy="100" r="15" fill="#DC143C"/>
+  <circle cx="200" cy="120" r="16" fill="#FF4500"/>
+  <circle cx="200" cy="120" r="13" fill="#DC143C"/>
+</svg>

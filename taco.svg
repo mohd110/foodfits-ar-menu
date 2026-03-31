@@ -1,0 +1,18 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shell -->
+  <ellipse cx="150" cy="120" rx="60" ry="70" fill="#D2B48C"/>
+  <!-- Taco filling -->
+  <ellipse cx="150" cy="135" rx="55" ry="50" fill="#8B4513"/>
+  <!-- Lettuce -->
+  <path d="M 110 130 Q 115 120 120 130 Q 125 120 130 130 Q 135 120 140 130 Q 145 120 150 130 Q 155 120 160 130 Q 165 120 170 130 Q 175 120 180 130 Q 185 120 190 130" fill="#228B22"/>
+  <!-- Cheese -->
+  <ellipse cx="130" cy="145" rx="20" ry="15" fill="#FFD700"/>
+  <ellipse cx="170" cy="140" rx="18" ry="14" fill="#FFD700"/>
+  <!-- Tomato -->
+  <circle cx="115" cy="155" r="10" fill="#DC143C"/>
+  <circle cx="185" cy="150" r="9" fill="#DC143C"/>
+  <!-- Sour cream -->
+  <ellipse cx="150" cy="160" rx="40" ry="12" fill="#F5F5DC"/>
+  <!-- Sauce drip -->
+  <path d="M 130 175 L 125 185 L 130 185" fill="#FF6347"/>
+</svg>
