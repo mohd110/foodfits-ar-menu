@@ -67,6 +67,13 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
 async function startProcessing() {
   if (isProcessing) return;
   isProcessing = true;
+  
+  // Auto-place food at center of screen on start
+  setTimeout(() => {
+    placeFood(window.innerWidth / 2, window.innerHeight / 2);
+    console.log('Food auto-placed at start');
+  }, 500);
+  
   processFrame();
 }
 
@@ -185,13 +192,20 @@ document.addEventListener('touchstart', (e) => {
 });
 
 function placeFood(x, y) {
+  console.log('Placing food at:', x, y);
   food.style.display = 'block';
-  const foodWidth = parseInt(food.style.width || '60');
+  
+  // Get computed width
+  const foodRect = food.getBoundingClientRect();
+  const foodWidth = foodRect.width || 80;
+  
   food.style.left = `${x - foodWidth / 2}px`;
   food.style.top = `${y - foodWidth / 2}px`;
   rotateAngle = Math.random() * 10 - 5;
   food.style.transform = `rotate(${rotateAngle}deg) scale(${scale})`;
   foodInfo.classList.remove('hidden');
+  
+  console.log('Food placed - display:', food.style.display, 'left:', food.style.left, 'top:', food.style.top);
 }
 
 food.addEventListener('touchstart', (e) => {
