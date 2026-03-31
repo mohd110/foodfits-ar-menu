@@ -1,6 +1,8 @@
 body {
   margin: 0;
   overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #000;
 }
 
 #camera {
@@ -16,32 +18,174 @@ body {
 
 #food {
   position: absolute;
-  width: 150px;
+  width: 10vw;
   display: none;
   filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.5));
   touch-action: none;
   z-index: 2;
+  transition: opacity 0.3s ease, filter 0.2s ease;
+  cursor: grab;
 }
 
+#food:active {
+  filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.7));
+  cursor: grabbing;
+}
+
+/* Loading State */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  transition: opacity 0.3s ease;
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #4ade80;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+  color: #fff;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Error State */
+.error-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 998;
+}
+
+.error-overlay.hidden {
+  display: none;
+}
+
+#error-text {
+  color: #ff6b6b;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+#error button {
+  padding: 12px 30px;
+  background: #4ade80;
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease;
+}
+
+#error button:hover {
+  background: #22c55e;
+}
+
+/* Food Info */
+.food-info {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  z-index: 4;
+  backdrop-filter: blur(10px);
+  transition: opacity 0.3s ease;
+}
+
+.food-info.hidden {
+  display: none;
+}
+
+/* Menu */
 #menu {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 10px;
+  gap: 12px;
   z-index: 3;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
 }
 
-#menu img {
+.menu-item {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.2s ease;
+}
+
+.menu-item:active {
+  transform: scale(0.95);
+}
+
+.menu-item img {
   width: 60px;
   height: 60px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 2px solid #fff;
-  cursor: pointer;
   object-fit: cover;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-#menu img:hover {
+.menu-item:hover img {
   border-color: #4ade80;
+  box-shadow: 0 6px 12px rgba(74, 222, 128, 0.4);
+  transform: scale(1.05);
+}
+
+.menu-item span {
+  font-size: 12px;
+  color: #fff;
+  font-weight: 600;
+  max-width: 70px;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }

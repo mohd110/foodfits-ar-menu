@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AR Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>AR Menu - Food Fits</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0"></script>
@@ -12,13 +15,46 @@
   <video id="camera" autoplay playsinline hidden></video>
   <canvas id="output"></canvas>
 
+  <!-- Loading State -->
+  <div id="loading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading AR...</p>
+  </div>
+
+  <!-- Error State -->
+  <div id="error" class="error-overlay hidden">
+    <p id="error-text"></p>
+    <button onclick="location.reload()">Retry</button>
+  </div>
+
+  <!-- Food Display -->
   <img id="food" src="pizza.png" hidden />
+  <div id="food-info" class="food-info hidden">
+    <span id="food-name">Pizza</span>
+  </div>
 
   <!-- Menu -->
   <div id="menu">
-    <img src="pizza.png" onclick="changeFood(this.src)">
-    <img src="burger.png" onclick="changeFood(this.src)">
-    <img src="sushi.png" onclick="changeFood(this.src)">
+    <div class="menu-item" onclick="changeFood('pizza.png', 'Pizza')" title="Pizza">
+      <img src="pizza.png" alt="Pizza">
+      <span>Pizza</span>
+    </div>
+    <div class="menu-item" onclick="changeFood('burger.png', 'Burger')" title="Burger">
+      <img src="burger.png" alt="Burger">
+      <span>Burger</span>
+    </div>
+    <div class="menu-item" onclick="changeFood('sushi.png', 'Sushi')" title="Sushi">
+      <img src="sushi.png" alt="Sushi">
+      <span>Sushi</span>
+    </div>
+    <div class="menu-item" onclick="changeFood('taco.png', 'Taco')" title="Taco">
+      <img src="taco.png" alt="Taco">
+      <span>Taco</span>
+    </div>
+    <div class="menu-item" onclick="changeFood('icecream.png', 'Ice Cream')" title="Ice Cream">
+      <img src="icecream.png" alt="Ice Cream">
+      <span>Ice Cream</span>
+    </div>
   </div>
 
   <script src="script.js"></script>

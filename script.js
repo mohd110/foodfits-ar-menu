@@ -2,14 +2,34 @@ const video = document.getElementById('camera');
 const canvas = document.getElementById('output');
 const ctx = canvas.getContext('2d');
 const food = document.getElementById('food');
+const loading = document.getElementById('loading');
+const error = document.getElementById('error');
+const errorText = document.getElementById('error-text');
+const foodInfo = document.getElementById('food-info');
+const foodName = document.getElementById('food-name');
 
 let net;
 let isProcessing = false;
+let personHeight = 0;
+let lastSegmentationTime = 0;
+let currentFoodName = 'Pizza';
 
 async function loadBodyPix() {
-  net = await bodyPix.load();
-  console.log('BodyPix loaded');
-  startProcessing();
+  try {
+    net = await bodyPix.load();
+    console.log('BodyPix loaded');
+    loading.classList.add('hidden');
+    startProcessing();
+  } catch (err) {
+    console.error('BodyPix load error:', err);
+    showError('Failed to load AR model. Please refresh.');
+  }
+}
+
+function showError(message) {
+  errorText.textContent = message;
+  error.classList.remove('hidden');
+  loading.classList.add('hidden');
 }
 
 navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
@@ -23,8 +43,8 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     };
   })
   .catch(err => {
-    console.error('Camera access needed', err);
-    alert('Camera access denied or unavailable. Run this in a secure context (HTTPS or localhost).');
+    console.error('Camera access error:', err);
+    showError('Camera access denied. Please enable camera permissions and refresh.');
   });
 
 async function startProcessing() {
@@ -36,12 +56,34 @@ async function startProcessing() {
 async function processFrame() {
   if (!net || video.readyState < 2) return;
 
+  const now = Date.now();
+  const timeSinceLastSegmentation = now - lastSegmentationTime;
+
+  // Throttle segmentation to 15fps max for performance
+  if (timeSinceLastSegmentation < 66) {
+    requestAnimationFrame(processFrame);
+    return;
+  }
+
+  lastSegmentationTime = now;
+
   try {
     const segmentation = await net.segmentPerson(video, {
       flipHorizontal: false,
       internalResolution: 'low',
       segmentationThreshold: 0.8,
     });
+
+    const { width, height, data } = segmentation;
+    let minY = height, maxY = 0;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] > 0.5) {
+        const y = Math.floor(i / width);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+      }
+    }
+    personHeight = (maxY - minY) * (video.videoHeight / height);
 
     const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
     const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
@@ -50,6 +92,12 @@ async function processFrame() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     bodyPix.drawMask(canvas, video, backgroundDarkeningMask, 1, 0, false);
+
+    // Adjust food size relative to person height
+    if (food.style.display === 'block' && personHeight > 0) {
+      const relativeSize = Math.max(50, personHeight * 0.3);
+      food.style.width = `${relativeSize}px`;
+    }
   } catch (error) {
     console.error('Segmentation error:', error);
     // Fallback: draw raw video
@@ -63,6 +111,7 @@ async function processFrame() {
 let isDragging = false;
 let initialDistance = 0;
 let scale = 1;
+let rotateAngle = 0;
 
 document.addEventListener('click', (e) => {
   if (e.target.closest('#menu')) return;
@@ -78,8 +127,13 @@ document.addEventListener('touchstart', (e) => {
 
 function placeFood(x, y) {
   food.style.display = 'block';
-  food.style.left = `${x}px`;
-  food.style.top = `${y}px`;
+  // Offset to place food at pointer center
+  const foodWidth = parseInt(food.style.width || '60');
+  food.style.left = `${x - foodWidth / 2}px`;
+  food.style.top = `${y - foodWidth / 2}px`;
+  rotateAngle = Math.random() * 10 - 5;
+  food.style.transform = `rotate(${rotateAngle}deg) scale(${scale})`;
+  foodInfo.classList.remove('hidden');
 }
 
 food.addEventListener('touchstart', (e) => {
@@ -111,12 +165,17 @@ food.addEventListener('touchmove', (e) => {
     const distance = Math.hypot(dx, dy);
     if (initialDistance > 0) {
       scale = distance / initialDistance;
-      food.style.transform = `scale(${scale})`;
+      food.style.transform = `rotate(${rotateAngle}deg) scale(${scale})`;
     }
     initialDistance = distance;
   }
 }, { passive: false });
 
-function changeFood(src) {
+function changeFood(src, name) {
   food.src = src;
+  currentFoodName = name;
+  foodName.textContent = name;
+  if (food.style.display === 'block') {
+    foodInfo.classList.remove('hidden');
+  }
 }
