@@ -12,7 +12,7 @@ async function loadBodyPix() {
   startProcessing();
 }
 
-navigator.mediaDevices.getUserMedia({ video: true })
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
   .then(stream => {
     video.srcObject = stream;
     video.onloadedmetadata = () => {
@@ -37,12 +37,12 @@ async function processFrame() {
 
   const segmentation = await net.segmentPerson(video, {
     flipHorizontal: false,
-    internalResolution: 'medium',
-    segmentationThreshold: 0.7,
+    internalResolution: 'low',
+    segmentationThreshold: 0.8,
   });
 
-  const foregroundColor = { r: 0, g: 0, b: 0, a: 0 };
-  const backgroundColor = { r: 0, g: 0, b: 0, a: 255 };
+  const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
+  const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
 
   const backgroundDarkeningMask = bodyPix.toMask(segmentation, foregroundColor, backgroundColor);
 
