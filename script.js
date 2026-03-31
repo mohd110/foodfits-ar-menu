@@ -18,6 +18,7 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     video.onloadedmetadata = () => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+      video.play();
       loadBodyPix();
     };
   })
@@ -33,20 +34,28 @@ async function startProcessing() {
 }
 
 async function processFrame() {
-  if (!net) return;
+  if (!net || video.readyState < 2) return;
 
-  const segmentation = await net.segmentPerson(video, {
-    flipHorizontal: false,
-    internalResolution: 'low',
-    segmentationThreshold: 0.8,
-  });
+  try {
+    const segmentation = await net.segmentPerson(video, {
+      flipHorizontal: false,
+      internalResolution: 'low',
+      segmentationThreshold: 0.8,
+    });
 
-  const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
-  const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
+    const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
+    const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
 
-  const backgroundDarkeningMask = bodyPix.toMask(segmentation, foregroundColor, backgroundColor);
+    const backgroundDarkeningMask = bodyPix.toMask(segmentation, foregroundColor, backgroundColor);
 
-  bodyPix.drawMask(canvas, video, backgroundDarkeningMask, 1, 0, false);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bodyPix.drawMask(canvas, video, backgroundDarkeningMask, 1, 0, false);
+  } catch (error) {
+    console.error('Segmentation error:', error);
+    // Fallback: draw raw video
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  }
 
   requestAnimationFrame(processFrame);
 }
