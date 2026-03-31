@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AR Menu</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0"></script>
+</head>
+<body>
+
+  <video id="camera" autoplay playsinline hidden></video>
+  <canvas id="output"></canvas>
+
+  <img id="food" src="pizza.png" hidden />
+
+  <!-- Menu -->
+  <div id="menu">
+    <img src="pizza.png" onclick="changeFood(this.src)">
+    <img src="burger.png" onclick="changeFood(this.src)">
+    <img src="sushi.png" onclick="changeFood(this.src)">
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

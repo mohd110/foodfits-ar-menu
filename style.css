@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+#camera {
+  display: none;
+}
+
+#output {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#food {
+  position: absolute;
+  width: 150px;
+  display: none;
+  filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.5));
+  touch-action: none;
+  z-index: 2;
+}
+
+#menu {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 3;
+}
+
+#menu img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  cursor: pointer;
+  object-fit: cover;
+}
+
+#menu img:hover {
+  border-color: #4ade80;
+}
