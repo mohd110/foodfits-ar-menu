@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
 </head>
 <body>
 
@@ -27,33 +29,57 @@
     <button onclick="location.reload()">Retry</button>
   </div>
 
-  <!-- Food Display -->
-  <img id="food" src="pizza.png" hidden />
-  <div id="food-info" class="food-info hidden">
-    <span id="food-name">Pizza</span>
-  </div>
+  <!-- App Container -->
+  <div class="app-container">
+    <!-- Header -->
+    <div class="app-header">
+      <div class="status-bar"></div>
+    </div>
 
-  <!-- Menu -->
-  <div id="menu">
-    <div class="menu-item" onclick="changeFood('pizza.png', 'Pizza')" title="Pizza">
-      <img src="pizza.png" alt="Pizza">
-      <span>Pizza</span>
+    <!-- Main Content Card -->
+    <div class="food-card">
+      <!-- AR Preview Section -->
+      <div class="ar-preview" id="ar-preview">
+        <img id="food" src="pizza.png" class="ar-food" />
+      </div>
+
+      <!-- Food Info Section -->
+      <div class="food-details">
+        <h2 id="food-name">Pizza</h2>
+        <p class="food-description" id="food-description">Delicious fresh pizza with premium toppings</p>
+        <div class="food-meta">
+          <span id="food-distance" class="distance-badge">Ready to order</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="orderFood()">ORDER NOW</button>
+      </div>
     </div>
-    <div class="menu-item" onclick="changeFood('burger.png', 'Burger')" title="Burger">
-      <img src="burger.png" alt="Burger">
-      <span>Burger</span>
-    </div>
-    <div class="menu-item" onclick="changeFood('sushi.png', 'Sushi')" title="Sushi">
-      <img src="sushi.png" alt="Sushi">
-      <span>Sushi</span>
-    </div>
-    <div class="menu-item" onclick="changeFood('taco.png', 'Taco')" title="Taco">
-      <img src="taco.png" alt="Taco">
-      <span>Taco</span>
-    </div>
-    <div class="menu-item" onclick="changeFood('icecream.png', 'Ice Cream')" title="Ice Cream">
-      <img src="icecream.png" alt="Ice Cream">
-      <span>Ice Cream</span>
+
+    <!-- Menu Bar -->
+    <div id="menu" class="menu-bar">
+      <div class="menu-item" onclick="changeFood('pizza.png', 'Pizza', 'Delicious fresh pizza with premium toppings')" title="Pizza">
+        <img src="pizza.png" alt="Pizza">
+        <span>Pizza</span>
+      </div>
+      <div class="menu-item" onclick="changeFood('burger.png', 'Burger', 'Juicy burger with fresh ingredients')" title="Burger">
+        <img src="burger.png" alt="Burger">
+        <span>Burger</span>
+      </div>
+      <div class="menu-item" onclick="changeFood('sushi.png', 'Sushi', 'Fresh sushi with premium fish')" title="Sushi">
+        <img src="sushi.png" alt="Sushi">
+        <span>Sushi</span>
+      </div>
+      <div class="menu-item" onclick="changeFood('taco.png', 'Taco', 'Authentic tacos with fresh salsa')" title="Taco">
+        <img src="taco.png" alt="Taco">
+        <span>Taco</span>
+      </div>
+      <div class="menu-item" onclick="changeFood('icecream.png', 'Ice Cream', 'Creamy ice cream in various flavors')" title="Ice Cream">
+        <img src="icecream.png" alt="Ice Cream">
+        <span>Ice Cream</span>
+      </div>
     </div>
   </div>
 

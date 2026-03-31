@@ -5,19 +5,38 @@ const food = document.getElementById('food');
 const loading = document.getElementById('loading');
 const error = document.getElementById('error');
 const errorText = document.getElementById('error-text');
-const foodInfo = document.getElementById('food-info');
+const arPreview = document.getElementById('ar-preview');
 const foodName = document.getElementById('food-name');
+const foodDescription = document.getElementById('food-description');
+const foodDistance = document.getElementById('food-distance');
 
 let net;
 let isProcessing = false;
 let personHeight = 0;
 let lastSegmentationTime = 0;
 let currentFoodName = 'Pizza';
+let currentFoodDescription = 'Delicious fresh pizza with premium toppings';
+let handDetector = null;
+let estimatedDistance = 100;
+let personFace = { x: 0, y: 0, width: 0 };
 
 async function loadBodyPix() {
   try {
     net = await bodyPix.load();
     console.log('BodyPix loaded');
+    
+    // Try to load hand detector for proximity sensing
+    try {
+      const model = await handPoseDetection.createDetector(
+        handPoseDetection.SupportedModels.MediaPipeHands,
+        { runtime: 'mediapipe', modelType: 'full' }
+      );
+      handDetector = model;
+      console.log('Hand detector loaded for proximity sensing');
+    } catch (e) {
+      console.log('Hand detector not available, using basic proximity detection');
+    }
+    
     loading.classList.add('hidden');
     startProcessing();
   } catch (err) {
@@ -75,15 +94,48 @@ async function processFrame() {
     });
 
     const { width, height, data } = segmentation;
-    let minY = height, maxY = 0;
+    let minY = height, maxY = 0, minX = width, maxX = 0;
+    
     for (let i = 0; i < data.length; i++) {
       if (data[i] > 0.5) {
         const y = Math.floor(i / width);
+        const x = i % width;
         minY = Math.min(minY, y);
         maxY = Math.max(maxY, y);
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
       }
     }
+    
     personHeight = (maxY - minY) * (video.videoHeight / height);
+    personFace = {
+      x: minX * (video.videoWidth / width),
+      y: minY * (video.videoHeight / height),
+      width: (maxX - minX) * (video.videoWidth / width)
+    };
+
+    // Try hand detection for proximity
+    if (handDetector) {
+      try {
+        const hands = await handDetector.estimateHands(video);
+        if (hands && hands.length > 0) {
+          // Hand detected - user is close
+          estimatedDistance = 40 + Math.random() * 20; // Closer range
+          proximityBar.classList.remove('hidden');
+          proximityBar.style.width = ((estimatedDistance - 20) / 80 * 100) + '%';
+        } else {
+          // No hands - user is far
+          estimatedDistance = Math.max(50, 100 - personHeight / 5);
+          proximityBar.classList.add('hidden');
+        }
+      } catch (e) {
+        estimatedDistance = Math.max(50, 100 - personHeight / 5);
+      }
+    } else {
+      // Fallback: use person height as proxy for distance
+      estimatedDistance = Math.max(50, 150 - personHeight / 3);
+      proximityBar.style.width = ((estimatedDistance - 30) / 120 * 100) + '%';
+    }
 
     const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
     const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
@@ -93,14 +145,21 @@ async function processFrame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     bodyPix.drawMask(canvas, video, backgroundDarkeningMask, 1, 0, false);
 
-    // Adjust food size relative to person height
-    if (food.style.display === 'block' && personHeight > 0) {
-      const relativeSize = Math.max(50, personHeight * 0.3);
-      food.style.width = `${relativeSize}px`;
+    // Scale food based on proximity + person height
+    if (food.style.display !== 'none') {
+      const baseSize = 15; // vw
+      const proximityScale = Math.min(3, estimatedDistance / 40); // Scales 0.4x to 3x
+      const heightScale = Math.max(1, personHeight / 200);
+      const finalScale = proximityScale * heightScale;
+      
+      food.style.setProperty('--scale', finalScale);
+      food.style.width = `calc(${baseSize}vw * ${finalScale})`;
+      
+      // Update distance display
+      foodDistance.textContent = `${Math.round(estimatedDistance)}cm away`;
     }
   } catch (error) {
     console.error('Segmentation error:', error);
-    // Fallback: draw raw video
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   }
@@ -112,28 +171,36 @@ let isDragging = false;
 let initialDistance = 0;
 let scale = 1;
 let rotateAngle = 0;
+let lastDragX = 0;
+let lastDragY = 0;
 
 document.addEventListener('click', (e) => {
-  if (e.target.closest('#menu')) return;
-  placeFood(e.clientX, e.clientY);
+  if (e.target.closest('#menu') || e.target.closest('.btn')) return;
+  if (e.target.closest('.food-card')) {
+    placeFood(e.clientX, e.clientY);
+  }
 });
 
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1 && !e.target.closest('#menu')) {
     const touch = e.touches[0];
-    placeFood(touch.clientX, touch.clientY);
+    const arRect = arPreview.getBoundingClientRect();
+    if (touch.clientY > arRect.top && touch.clientY < arRect.bottom) {
+      placeFood(touch.clientX, touch.clientY);
+    }
   }
 });
 
 function placeFood(x, y) {
   food.style.display = 'block';
-  // Offset to place food at pointer center
-  const foodWidth = parseInt(food.style.width || '60');
-  food.style.left = `${x - foodWidth / 2}px`;
-  food.style.top = `${y - foodWidth / 2}px`;
-  rotateAngle = Math.random() * 10 - 5;
-  food.style.transform = `rotate(${rotateAngle}deg) scale(${scale})`;
-  foodInfo.classList.remove('hidden');
+  const arRect = arPreview.getBoundingClientRect();
+  const relX = x - arRect.left;
+  const relY = y - arRect.top;
+  
+  const foodWidth = food.offsetWidth || 60;
+  food.style.left = `${relX - foodWidth / 2}px`;
+  food.style.top = `${relY - foodWidth / 2}px`;
+  food.style.transform = `rotate(0deg) scale(1)`;
 }
 
 food.addEventListener('touchstart', (e) => {
@@ -171,11 +238,22 @@ food.addEventListener('touchmove', (e) => {
   }
 }, { passive: false });
 
-function changeFood(src, name) {
+function changeFood(src, name, description) {
   food.src = src;
   currentFoodName = name;
+  currentFoodDescription = description;
   foodName.textContent = name;
+  foodDescription.textContent = description;
   if (food.style.display === 'block') {
-    foodInfo.classList.remove('hidden');
+    scale = 1;
+    rotateAngle = 0;
+  }
+}
+
+function orderFood() {
+  if (food.style.display === 'block') {
+    alert(`Order for ${currentFoodName} placed! 🎉\n\nThis is a demo app. In production, this would proceed to checkout.`);
+  } else {
+    alert('Please place a food item on the table first!');
   }
 }
